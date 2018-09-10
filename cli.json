@@ -1,0 +1,13 @@
+{
+  "requirements": {
+    "go": "1.9.2"
+  },
+  "commands": [
+    {
+      "name": "overview",
+      "version": "0.0.1",
+      "description": "Properties Overview Commands",
+      "bin": "https://github.com/partamonov/akamai-cli-overview/releases/download/v{{.Version}}/akamai-{{.Name}}_{{.OS}}_{{.Arch}}{{.BinSuffix}}"
+    }
+  ]
+}
