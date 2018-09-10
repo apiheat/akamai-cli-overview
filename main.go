@@ -169,6 +169,11 @@ func main() {
 			Usage:  "Lists the set of custom XML metadata overrides configured for you by Akamai representatives",
 			Action: cmdOverrides,
 		},
+		{
+			Name:   "custom-behaviors",
+			Usage:  "Lists the set of custom XML metadata behaviors configured for you by Akamai representativess",
+			Action: cmdBehaviors,
+		},
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))

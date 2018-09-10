@@ -115,6 +115,33 @@ type OverridesResponse struct {
 	} `json:"customOverrides"`
 }
 
+type BehaviorsResponse struct {
+	AccountID       string `json:"accountId"`
+	CustomBehaviors struct {
+		Items []struct {
+			BehaviorID    string    `json:"behaviorId"`
+			Name          string    `json:"name"`
+			Status        string    `json:"status"`
+			DisplayName   string    `json:"displayName"`
+			Description   string    `json:"description"`
+			UpdatedDate   time.Time `json:"updatedDate"`
+			UpdatedByUser string    `json:"updatedByUser"`
+		} `json:"items"`
+	} `json:"customBehaviors"`
+}
+
+func outputTableBehaviors(data BehaviorsResponse) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', 0)
+
+	fmt.Fprintln(w, fmt.Sprint("# ID\tName\tDisplay Name\tDescription\tStatus\tUpdated By\tUpdated At"))
+	for _, single := range data.CustomBehaviors.Items {
+		fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s", single.BehaviorID, single.Name, single.DisplayName, single.Description, single.Status, single.UpdatedByUser, single.UpdatedDate))
+	}
+
+	w.Flush()
+
+}
+
 func outputTableOverrides(data OverridesResponse) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', 0)
 

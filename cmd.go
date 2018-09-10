@@ -24,6 +24,10 @@ func cmdOverrides(c *cli.Context) error {
 	return listOverrides(c)
 }
 
+func cmdBehaviors(c *cli.Context) error {
+	return listBehaviors(c)
+}
+
 func cmdCPCodes(c *cli.Context) error {
 	if c.String("group") == "" {
 		log.Fatal("Please provide Group ID")
@@ -239,6 +243,34 @@ func listOverrides(c *cli.Context) error {
 	outputTableOverrides(result)
 
 	return nil
+}
+
+func listBehaviors(c *cli.Context) error {
+	urlStr := fmt.Sprintf("%s/custom-behaviors", URL)
+
+	if debug {
+		println(urlStr)
+	}
+
+	data, _ := fetchData(urlStr, "GET", nil)
+
+	if debug {
+		println(data)
+	}
+
+	result, err := behaviorsRespParse(data)
+	errorCheck(err)
+
+	outputTableBehaviors(result)
+
+	return nil
+}
+
+func behaviorsRespParse(in string) (data BehaviorsResponse, err error) {
+	if err = json.Unmarshal([]byte(in), &data); err != nil {
+		return
+	}
+	return
 }
 
 func rulesRespParse(in string) (data RulesResponse, err error) {
