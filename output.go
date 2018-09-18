@@ -6,6 +6,8 @@ import (
 	"os"
 	"text/tabwriter"
 	"time"
+
+	edgegrid "github.com/RafPe/go-edgegrid"
 )
 
 type GroupsResponse struct {
@@ -130,108 +132,48 @@ type BehaviorsResponse struct {
 	} `json:"customBehaviors"`
 }
 
-func outputTableBehaviors(data BehaviorsResponse) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', 0)
-
-	fmt.Fprintln(w, fmt.Sprint("# ID\tName\tDisplay Name\tDescription\tStatus\tUpdated By\tUpdated At"))
-	for _, single := range data.CustomBehaviors.Items {
-		fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s", single.BehaviorID, single.Name, single.DisplayName, single.Description, single.Status, single.UpdatedByUser, single.UpdatedDate))
-	}
-
-	w.Flush()
-
-}
-
-func outputTableOverrides(data OverridesResponse) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', 0)
-
-	fmt.Fprintln(w, fmt.Sprint("# ID\tName\tDisplay Name\tDescription\tStatus\tUpdated By\tUpdated At"))
-	for _, single := range data.CustomOverrides.Items {
-		fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%s\t%s\t%s", single.OverrideID, single.Name, single.DisplayName, single.Description, single.Status, single.UpdatedByUser, single.UpdatedDate))
-	}
-
-	w.Flush()
-
-}
-
-func outputTableEdges(data EdgesResponse) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', 0)
-
-	fmt.Fprintln(w, fmt.Sprint("# ID\tDomain Name\tStatus\tIP Version\tSecure?\tMap Domain\t Map Slot Nr\tMap Serial Nr"))
-	for _, single := range data.EdgeHostnames.Items {
-		fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s\t%t\t%s\t%d\t%d", single.EdgeHostnameID, single.EdgeHostnameDomain, single.Status, single.IPVersionBehavior, single.Secure, single.MapDetailsMapDomain, single.MapDetailsSlotNumber, single.MapDetailsSerialNumber))
-	}
-
-	w.Flush()
-
-}
-
-func outputTableProperties(data PropertiesResponse) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', 0)
-
-	fmt.Fprintln(w, fmt.Sprint("# ID\tName\tPRD Version\tACC Version\tLatest Version\tAsset ID"))
-	for _, single := range data.Properties.Items {
-		fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%d\t%d\t%d\t%s", single.PropertyID, single.PropertyName, single.ProductionVersion, single.StagingVersion, single.LatestVersion, single.AssetID))
-	}
-
-	w.Flush()
-
-}
-
-func outputTableProducts(data ProductsResponse) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', 0)
-
-	fmt.Fprintln(w, fmt.Sprint("# ID\tName"))
-	for _, singleProduct := range data.Products.Items {
-		fmt.Fprintln(w, fmt.Sprintf("%s\t%s", singleProduct.ProductID, singleProduct.ProductName))
-	}
-
-	w.Flush()
-
-}
-
-func outputTableGroups(data GroupsResponse) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', 0)
-
-	fmt.Fprintln(w, fmt.Sprint("# ID\tContractID\tName\tParent Group"))
-	for _, singleGroup := range data.Groups.Items {
-		fmt.Fprintln(w, fmt.Sprintf("%s\t%s\t%s\t%s", singleGroup.GroupID, singleGroup.ContractIds, singleGroup.GroupName, singleGroup.ParentGroupID))
-	}
-
-	w.Flush()
-
-}
-
-func outputTableRules(data RulesResponse) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', 0)
-
-	fmt.Fprintln(w, fmt.Sprint("# Rule Formats"))
-	for _, singleGroup := range data.RuleFormats.Items {
-		fmt.Fprintln(w, fmt.Sprintf("%s", singleGroup))
-	}
-
-	w.Flush()
-
-}
-
-func outputTableContracts(data ContractsResponse) {
-	w := tabwriter.NewWriter(os.Stdout, 0, 0, padding, ' ', 0)
-
-	fmt.Fprintln(w, fmt.Sprint("# ID \t Name"))
-	for _, singleContract := range data.Contracts.Items {
-		fmt.Fprintln(w, fmt.Sprintf("%s \t %s", singleContract.ContractID, singleContract.ContractTypeName))
-	}
-
-	w.Flush()
-
-}
-
-func outputTableCPCodes(data CPCodesResponse) {
+func outputTableCPCodes(cpcodes *edgegrid.PropertyAPICPCodes) {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 0, ' ', 0)
 
 	fmt.Fprintln(w, fmt.Sprint("# ID \t ProductIDs \t Created \t Name"))
-	for _, singleCPcoode := range data.Cpcodes.Items {
+	for _, singleCPcoode := range cpcodes.Cpcodes.Items {
 		fmt.Fprintln(w, fmt.Sprintf("%s \t %s \t %s \t %s", singleCPcoode.CpcodeID, singleCPcoode.ProductIds, singleCPcoode.CreatedDate, singleCPcoode.CpcodeName))
+	}
+
+	w.Flush()
+
+}
+
+func outputTableProducts(products *edgegrid.PropertyAPIProducts) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 0, ' ', 0)
+
+	fmt.Fprintln(w, fmt.Sprint("# ID \t Name"))
+	for _, singleProduct := range products.Products.Items {
+		fmt.Fprintln(w, fmt.Sprintf("%s \t %s", singleProduct.ProductID, singleProduct.ProductName))
+	}
+
+	w.Flush()
+
+}
+
+func outputTableGroups(groups *edgegrid.PropertyAPIGroups) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 0, ' ', 0)
+
+	fmt.Fprintln(w, fmt.Sprint("# ID \t ContractID \t Name"))
+	for _, singleGroup := range groups.Groups.Items {
+		fmt.Fprintln(w, fmt.Sprintf("%s \t %s \t %s", singleGroup.GroupID, singleGroup.ContractIds, singleGroup.GroupName))
+	}
+
+	w.Flush()
+
+}
+
+func outputTableContracts(contracts *edgegrid.PropertyAPIContracts) {
+	w := tabwriter.NewWriter(os.Stdout, 0, 0, 0, ' ', 0)
+
+	fmt.Fprintln(w, fmt.Sprint("# ID \t Name"))
+	for _, singleContract := range contracts.Contracts.Items {
+		fmt.Fprintln(w, fmt.Sprintf("%s \t %s", singleContract.ContractID, singleContract.ContractTypeName))
 	}
 
 	w.Flush()
