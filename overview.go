@@ -20,7 +20,11 @@ func listContracts(c *cli.Context) error {
 		fmt.Println(err)
 	}
 
-	outputTableContracts(contracts)
+	if output == "json" {
+		OutputJSON(contracts)
+	} else {
+		outputTableContracts(contracts)
+	}
 
 	return nil
 }
@@ -92,6 +96,56 @@ func listCPcodes(c *cli.Context) error {
 		OutputJSON(cpcodes)
 	} else {
 		outputTableCPCodes(cpcodes)
+	}
+
+	return nil
+}
+
+/*
+	ListEdgeHostNames
+*/
+func cmdListEdgeHostNames(c *cli.Context) error {
+	return listEdgeHostNames(c)
+}
+
+func listEdgeHostNames(c *cli.Context) error {
+	verifyArgumentByName(c, "contractID")
+	verifyArgumentByName(c, "groupID")
+
+	cpcodes, _, err := apiClient.PropertyAPI.ListPropertyAPICPEdgehosts(contractID, groupID)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if output == "json" {
+		OutputJSON(cpcodes)
+	} else {
+		// outputTableCPCodes(cpcodes)
+	}
+
+	return nil
+}
+
+/*
+	ListProperties
+*/
+func cmdListProperties(c *cli.Context) error {
+	return listProperties(c)
+}
+
+func listProperties(c *cli.Context) error {
+	verifyArgumentByName(c, "contractID")
+	verifyArgumentByName(c, "groupID")
+
+	cpcodes, _, err := apiClient.PropertyAPI.ListPropertyAPIProperties(contractID, groupID)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	if output == "json" {
+		OutputJSON(cpcodes)
+	} else {
+		// outputTableCPCodes(cpcodes)
 	}
 
 	return nil

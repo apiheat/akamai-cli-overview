@@ -19,12 +19,6 @@ var (
 	groupID, contractID      string
 )
 
-// Constants
-const (
-	URL     = "/papi/v1"
-	padding = 3
-)
-
 func main() {
 
 	/*
@@ -86,6 +80,18 @@ func main() {
 		},
 	}
 
+	app.Before = func(c *cli.Context) error {
+
+		// create new Akamai API client
+		apiClient = edgegrid.NewClient(nil, apiClientOpts)
+
+		// if err != nil {
+		// 	return cli.NewExitError(errorProfile, 1)
+		// }
+
+		return nil
+	}
+
 	app.Commands = []cli.Command{
 		{
 			Name:   "contracts",
@@ -114,48 +120,38 @@ func main() {
 			Usage: "Lists properties available for the current contract and group",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:  "groupID",
-					Value: "",
-					Usage: "Unique identifier for the group",
+					Name:        "contractID",
+					Usage:       "",
+					Destination: &contractID,
 				},
 				cli.StringFlag{
-					Name:  "contractID",
-					Value: "",
-					Usage: "Unique identifier for the contract",
+					Name:        "groupID",
+					Usage:       "",
+					Destination: &groupID,
 				},
 				cli.BoolFlag{
 					Name:  "all",
 					Usage: "Show All properties",
 				},
 			},
-			Action: cmdProperties,
-		},
-		{
-			Name:   "products",
-			Usage:  "Lists the set of products that are available under a given contract",
-			Action: cmdProducts,
+			Action: cmdListProperties,
 		},
 		{
 			Name:  "edge-hostnames",
 			Usage: "Lists all edge hostnames available under a contract",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:  "group",
-					Value: "",
-					Usage: "Unique identifier for the group",
+					Name:        "contractID",
+					Usage:       "",
+					Destination: &contractID,
 				},
 				cli.StringFlag{
-					Name:  "contract",
-					Value: "",
-					Usage: "Unique identifier for the contract",
-				},
-				cli.StringFlag{
-					Name:  "options",
-					Value: "mapDetails",
-					Usage: "Comma-separated list of options to enable; mapDetails enables extra mapping-related information",
+					Name:        "groupID",
+					Usage:       "",
+					Destination: &groupID,
 				},
 			},
-			Action: cmdEdges,
+			Action: cmdListEdgeHostNames,
 		},
 		{
 			Name:  "cpcodes",
@@ -175,21 +171,21 @@ func main() {
 			Action:   cmdListCPcodes,
 			Category: "CPCodes actions",
 		},
-		{
-			Name:   "rule-formats",
-			Usage:  "List all available rule formats",
-			Action: cmdRules,
-		},
-		{
-			Name:   "custom-overrides",
-			Usage:  "Lists the set of custom XML metadata overrides configured for you by Akamai representatives",
-			Action: cmdOverrides,
-		},
-		{
-			Name:   "custom-behaviors",
-			Usage:  "Lists the set of custom XML metadata behaviors configured for you by Akamai representativess",
-			Action: cmdBehaviors,
-		},
+		// {
+		// 	Name:   "rule-formats",
+		// 	Usage:  "List all available rule formats",
+		// 	Action: cmdRules,
+		// },
+		// {
+		// 	Name:   "custom-overrides",
+		// 	Usage:  "Lists the set of custom XML metadata overrides configured for you by Akamai representatives",
+		// 	Action: cmdOverrides,
+		// },
+		// {
+		// 	Name:   "custom-behaviors",
+		// 	Usage:  "Lists the set of custom XML metadata behaviors configured for you by Akamai representativess",
+		// 	Action: cmdBehaviors,
+		// },
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
