@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"sort"
@@ -204,4 +205,17 @@ func main() {
 		log.Fatal(err)
 	}
 
+}
+
+func verifyArgumentByName(c *cli.Context, argName string) {
+	if c.String(argName) == "" {
+		log.Fatal(fmt.Sprintf("Please provide required argument(s)! [ %s ]", argName))
+	}
+}
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }
