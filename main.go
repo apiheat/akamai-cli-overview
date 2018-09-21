@@ -72,12 +72,6 @@ func main() {
 			Destination: &apiClientOpts.ConfigPath,
 			EnvVar:      string(edgegrid.EnvVarEdgercPath),
 		},
-		cli.StringFlag{
-			Name:        "output",
-			Value:       "json",
-			Usage:       "Defines output type ( json | table ) ",
-			Destination: &output,
-		},
 	}
 
 	app.Before = func(c *cli.Context) error {
