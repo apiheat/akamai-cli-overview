@@ -126,3 +126,67 @@ func listProperties(c *cli.Context) error {
 
 	return nil
 }
+
+/*
+	#TODO:The below functions still should end up in go-edge client in the papi secion ...
+*/
+
+/*
+	ListRules
+*/
+func cmdListRules(c *cli.Context) error {
+	return listRules(c)
+}
+
+func listRules(c *cli.Context) error {
+	var k *RulesResponse
+	_, err := apiClient.NewRequest("GET", "/papi/v1/rule-formats", nil, &k)
+	if err != nil {
+
+		return err
+	}
+
+	OutputJSON(k.RuleFormats.Items)
+
+	return nil
+}
+
+/*
+	ListOverrides
+*/
+func cmdListOverrides(c *cli.Context) error {
+	return listOverrides(c)
+}
+
+func listOverrides(c *cli.Context) error {
+	var k *OverridesResponse
+	_, err := apiClient.NewRequest("GET", "/papi/v1/custom-overrides", nil, &k)
+	if err != nil {
+
+		return err
+	}
+
+	OutputJSON(k)
+
+	return nil
+}
+
+/*
+	ListBehaviors
+*/
+func cmdListBehaviors(c *cli.Context) error {
+	return listBehaviors(c)
+}
+
+func listBehaviors(c *cli.Context) error {
+	var k *OverridesResponse
+	_, err := apiClient.NewRequest("GET", "/papi/v1/custom-behaviors", nil, &k)
+	if err != nil {
+
+		return err
+	}
+
+	OutputJSON(k)
+
+	return nil
+}

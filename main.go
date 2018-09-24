@@ -162,8 +162,22 @@ func main() {
 					Destination: &groupID,
 				},
 			},
-			Action:   cmdListCPcodes,
-			Category: "CPCodes actions",
+			Action: cmdListCPcodes,
+		},
+		{
+			Name:   "rule-formats",
+			Usage:  "List all available rule formats",
+			Action: cmdListRules,
+		},
+		{
+			Name:   "custom-overrides",
+			Usage:  "Lists the set of custom XML metadata overrides configured for you by Akamai representatives",
+			Action: cmdListOverrides,
+		},
+		{
+			Name:   "custom-behaviors",
+			Usage:  "Lists the set of custom XML metadata behaviors configured for you by Akamai representativess",
+			Action: cmdListBehaviors,
 		},
 	}
 
