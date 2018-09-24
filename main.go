@@ -15,7 +15,7 @@ import (
 var (
 	apiClient           *edgegrid.Client
 	apiClientOpts       *edgegrid.ClientOptions
-	homeDir, output     string
+	homeDir, appVer     string
 	groupID, contractID string
 )
 
@@ -46,7 +46,7 @@ func main() {
 	app.Name = appName
 	app.HelpName = appName
 	app.Usage = "A CLI to interact with Akamai account information"
-	app.Version = "1.0.0"
+	app.Version = appVer
 	app.Copyright = ""
 	app.Authors = []cli.Author{
 		{
