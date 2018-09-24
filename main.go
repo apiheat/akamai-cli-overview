@@ -1,41 +1,52 @@
 package main
 
 import (
+	"fmt"
+	"log"
 	"os"
 	"sort"
 
-	"github.com/akamai/AkamaiOPEN-edgegrid-golang/edgegrid"
-	"github.com/fatih/color"
+	edgegrid "github.com/RafPe/go-edgegrid"
 	homedir "github.com/mitchellh/go-homedir"
+
 	"github.com/urfave/cli"
 )
 
 var (
-	colorOn, raw, debug       bool
-	version, appName          string
-	configSection, configFile string
-	edgeConfig                edgegrid.Config
-)
-
-// Constants
-const (
-	URL     = "/papi/v1"
-	padding = 3
+	apiClient           *edgegrid.Client
+	apiClientOpts       *edgegrid.ClientOptions
+	homeDir, appVer     string
+	groupID, contractID string
 )
 
 func main() {
-	_, inCLI := os.LookupEnv("AKAMAI_CLI")
 
-	appName = "akamai-overview"
-	if inCLI {
-		appName = "akamai overview"
-	}
+	/*
+		Sets default value for credentials configuration file
+		to be pointing to ~/.edgerc
+	*/
+	homeDir, _ = homedir.Dir()
+	homeDir += string(os.PathSeparator) + ".edgerc"
+
+	/*
+		Initialize values with using ENV variables either defaults
+		AKAMAI_EDGERC_CONFIG  : for config file path
+		AKAMAI_EDGERC_SECTION : for section
+	*/
+	apiClientOpts := &edgegrid.ClientOptions{}
+	apiClientOpts.ConfigPath = getEnv(string(edgegrid.EnvVarEdgercPath), homeDir)
+	apiClientOpts.ConfigSection = getEnv(string(edgegrid.EnvVarEdgercSection), "default")
+
+	/*
+		Sets default values for app and global flags
+	*/
+	appName := "akamai-overview"
 
 	app := cli.NewApp()
 	app.Name = appName
 	app.HelpName = appName
-	app.Usage = "A CLI to list contracts, groups, properties"
-	app.Version = version
+	app.Usage = "A CLI to interact with Akamai account information"
+	app.Version = appVer
 	app.Copyright = ""
 	app.Authors = []cli.Author{
 		{
@@ -46,147 +57,154 @@ func main() {
 		},
 	}
 
-	dir, _ := homedir.Dir()
-	dir += string(os.PathSeparator) + ".edgerc"
-
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:        "section, s",
 			Value:       "default",
 			Usage:       "`NAME` of section to use from credentials file",
-			Destination: &configSection,
-			EnvVar:      "AKAMAI_EDGERC_SECTION",
+			Destination: &apiClientOpts.ConfigSection,
+			EnvVar:      string(edgegrid.EnvVarEdgercSection),
 		},
 		cli.StringFlag{
 			Name:        "config, c",
-			Value:       dir,
+			Value:       homeDir,
 			Usage:       "Location of the credentials `FILE`",
-			Destination: &configFile,
-			EnvVar:      "AKAMAI_EDGERC",
+			Destination: &apiClientOpts.ConfigPath,
+			EnvVar:      string(edgegrid.EnvVarEdgercPath),
 		},
-		cli.BoolFlag{
-			Name:        "no-color",
-			Usage:       "Disable color output",
-			Destination: &colorOn,
-		},
-		cli.BoolFlag{
-			Name:        "debug",
-			Usage:       "Debug info",
-			Destination: &debug,
-		},
+	}
+
+	app.Before = func(c *cli.Context) error {
+
+		// create new Akamai API client
+		apiClient = edgegrid.NewClient(nil, apiClientOpts)
+
+		// if err != nil {
+		// 	return cli.NewExitError(errorProfile, 1)
+		// }
+
+		return nil
 	}
 
 	app.Commands = []cli.Command{
 		{
-			Name:    "groups",
-			Aliases: []string{"grp"},
-			Usage:   "Lists the set of groups for account",
-			Action:  cmdGroups,
+			Name:   "contracts",
+			Usage:  "List associated account contracts",
+			Action: cmdListContracts,
 		},
 		{
-			Name:    "contracts",
-			Aliases: []string{"ctr"},
-			Usage:   "Lists the set of contracts",
-			Action:  cmdContracts,
+			Name:   "groups",
+			Usage:  "List associated account groups",
+			Action: cmdListGroups,
 		},
 		{
-			Name:    "properties",
-			Aliases: []string{"prp"},
-			Usage:   "Lists properties available for the current contract and group",
+			Name:  "products",
+			Usage: "List associated contract products",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:  "group",
-					Value: "",
-					Usage: "Unique identifier for the group",
+					Name:        "contractID",
+					Usage:       "",
+					Destination: &contractID,
+				},
+			},
+			Action: cmdListProducts,
+		},
+		{
+			Name:  "properties",
+			Usage: "Lists properties available for the current contract and group",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:        "contractID",
+					Usage:       "",
+					Destination: &contractID,
 				},
 				cli.StringFlag{
-					Name:  "contract",
-					Value: "",
-					Usage: "Unique identifier for the contract",
+					Name:        "groupID",
+					Usage:       "",
+					Destination: &groupID,
 				},
 				cli.BoolFlag{
 					Name:  "all",
 					Usage: "Show All properties",
 				},
 			},
-			Action: cmdProperties,
+			Action: cmdListProperties,
 		},
 		{
-			Name:    "products",
-			Aliases: []string{"pr"},
-			Usage:   "Lists the set of products that are available under a given contract",
-			Action:  cmdProducts,
-		},
-		{
-			Name:    "edge-hostnames",
-			Aliases: []string{"e"},
-			Usage:   "Lists all edge hostnames available under a contract",
+			Name:  "edge-hostnames",
+			Usage: "Lists all edge hostnames available under a contract",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:  "group",
-					Value: "",
-					Usage: "Unique identifier for the group",
+					Name:        "contractID",
+					Usage:       "",
+					Destination: &contractID,
 				},
 				cli.StringFlag{
-					Name:  "contract",
-					Value: "",
-					Usage: "Unique identifier for the contract",
-				},
-				cli.StringFlag{
-					Name:  "options",
-					Value: "mapDetails",
-					Usage: "Comma-separated list of options to enable; mapDetails enables extra mapping-related information",
+					Name:        "groupID",
+					Usage:       "",
+					Destination: &groupID,
 				},
 			},
-			Action: cmdEdges,
+			Action: cmdListEdgeHostNames,
 		},
 		{
-			Name:    "cpcodes",
-			Aliases: []string{"cpc"},
-			Usage:   "Lists CP codes available within your contract/group pairing",
+			Name:  "cpcodes",
+			Usage: "List associated contract/group cpcodes",
 			Flags: []cli.Flag{
 				cli.StringFlag{
-					Name:  "group",
-					Value: "",
-					Usage: "Unique identifier for the group",
+					Name:        "contractID",
+					Usage:       "",
+					Destination: &contractID,
 				},
 				cli.StringFlag{
-					Name:  "contract",
-					Value: "",
-					Usage: "Unique identifier for the contract",
+					Name:        "groupID",
+					Usage:       "",
+					Destination: &groupID,
 				},
 			},
-			Action: cmdCPCodes,
+			Action: cmdListCPcodes,
 		},
 		{
-			Name:    "rule-formats",
-			Aliases: []string{"rf"},
-			Usage:   "List all available rule formats",
-			Action:  cmdRules,
+			Name:   "rule-formats",
+			Usage:  "List all available rule formats",
+			Action: cmdListRules,
 		},
 		{
 			Name:   "custom-overrides",
 			Usage:  "Lists the set of custom XML metadata overrides configured for you by Akamai representatives",
-			Action: cmdOverrides,
+			Action: cmdListOverrides,
 		},
 		{
 			Name:   "custom-behaviors",
 			Usage:  "Lists the set of custom XML metadata behaviors configured for you by Akamai representativess",
-			Action: cmdBehaviors,
+			Action: cmdListBehaviors,
 		},
 	}
 
 	sort.Sort(cli.FlagsByName(app.Flags))
 	sort.Sort(cli.CommandsByName(app.Commands))
 
-	app.Before = func(c *cli.Context) error {
-		if c.Bool("no-color") {
-			color.NoColor = true
-		}
+	app.Action = func(c *cli.Context) error {
 
-		config(configFile, configSection)
 		return nil
 	}
 
-	app.Run(os.Args)
+	err := app.Run(os.Args)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+}
+
+func verifyArgumentByName(c *cli.Context, argName string) {
+	if c.String(argName) == "" {
+		log.Fatal(fmt.Sprintf("Please provide required argument(s)! [ %s ]", argName))
+	}
+}
+
+func getEnv(key, fallback string) string {
+	if value, ok := os.LookupEnv(key); ok {
+		return value
+	}
+	return fallback
 }
