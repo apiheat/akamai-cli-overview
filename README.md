@@ -32,33 +32,28 @@ This CLI intended to be used as overview tool. It support list commands for PAPI
 ## Main Command Usage
 ```shell
 NAME:
-   akamai overview - A CLI to list contracts, groups, properties
+   akamai-overview - A CLI to interact with Akamai account information
 
 USAGE:
-   akamai overview [global options] command [command options] [arguments...]
-
-VERSION:
-   0.0.1
+   akamai-overview [global options] command [command options] [arguments...]
 
 AUTHORS:
    Petr Artamonov
    Rafal Pieniazek
 
 COMMANDS:
-     contracts, ctr     Lists the set of contracts
-     cpcodes, cpc       Lists CP codes available within your contract/group pairing
-     custom-overrides   Lists the set of custom XML metadata overrides configured for you by Akamai representatives
-     edge-hostnames, e  Lists all edge hostnames available under a contract
-     groups, grp        Lists the set of groups for account
-     products, pr       Lists the set of products that are available under a given contract
-     properties, prp    Lists properties available for the current contract and group
-     rule-formats, rf   List all available rule formats
-     help, h            Shows a list of commands or help for one command
+     contracts       List associated account contracts
+     edge-hostnames  Lists all edge hostnames available under a contract
+     groups          List associated account groups
+     products        List associated contract products
+     properties      Lists properties available for the current contract and group
+     help, h         Shows a list of commands or help for one command
+
+   CPCodes actions:
+     cpcodes  List associated contract/group cpcodes
 
 GLOBAL OPTIONS:
-   --config FILE, -c FILE   Location of the credentials FILE (default: "$HOME/.edgerc") [$AKAMAI_EDGERC]
-   --debug                  Debug info
-   --no-color               Disable color output
+   --config FILE, -c FILE   Location of the credentials FILE (default: "/Users/rpieniazek/.edgerc") [$AKAMAI_EDGERC_CONFIG]
    --section NAME, -s NAME  NAME of section to use from credentials file (default: "default") [$AKAMAI_EDGERC_SECTION]
    --help, -h               show help
    --version, -v            print the version

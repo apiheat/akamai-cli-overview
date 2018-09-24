@@ -13,10 +13,10 @@ import (
 )
 
 var (
-	apiClient                *edgegrid.Client
-	apiClientOpts            *edgegrid.ClientOptions
-	homeDir, output, version string
-	groupID, contractID      string
+	apiClient           *edgegrid.Client
+	apiClientOpts       *edgegrid.ClientOptions
+	homeDir, output     string
+	groupID, contractID string
 )
 
 func main() {
@@ -46,7 +46,7 @@ func main() {
 	app.Name = appName
 	app.HelpName = appName
 	app.Usage = "A CLI to interact with Akamai account information"
-	app.Version = version
+	app.Version = "1.0.0"
 	app.Copyright = ""
 	app.Authors = []cli.Author{
 		{
