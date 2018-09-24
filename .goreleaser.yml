@@ -2,7 +2,7 @@
 # Build customization
 builds:
   -
-    binary: akamai-cli-overview
+    binary: akamai-overview
     ldflags: -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}} -X main.appVer=$TRAVIS_TAG
     goos:
       - windows
