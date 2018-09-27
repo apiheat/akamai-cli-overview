@@ -1,8 +1,6 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
 	"time"
 )
 
@@ -40,16 +38,4 @@ type BehaviorsResponse struct {
 			UpdatedByUser string    `json:"updatedByUser"`
 		} `json:"items"`
 	} `json:"customBehaviors"`
-}
-
-// OutputJSON displays output of query for alerts in JSON format
-//
-// output
-func OutputJSON(input interface{}) {
-	b, err := json.Marshal(input)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-	fmt.Println(string(b))
 }

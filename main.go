@@ -1,13 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"sort"
 
-	edgegrid "github.com/RafPe/go-edgegrid"
-	homedir "github.com/mitchellh/go-homedir"
+	common "github.com/apiheat/akamai-cli-common"
+	edgegrid "github.com/apiheat/go-edgegrid"
 
 	"github.com/urfave/cli"
 )
@@ -15,73 +14,22 @@ import (
 var (
 	apiClient           *edgegrid.Client
 	apiClientOpts       *edgegrid.ClientOptions
-	homeDir, appVer     string
+	appVer, appName     string
 	groupID, contractID string
 )
 
 func main() {
-
-	/*
-		Sets default value for credentials configuration file
-		to be pointing to ~/.edgerc
-	*/
-	homeDir, _ = homedir.Dir()
-	homeDir += string(os.PathSeparator) + ".edgerc"
-
-	/*
-		Initialize values with using ENV variables either defaults
-		AKAMAI_EDGERC_CONFIG  : for config file path
-		AKAMAI_EDGERC_SECTION : for section
-	*/
-	apiClientOpts := &edgegrid.ClientOptions{}
-	apiClientOpts.ConfigPath = getEnv(string(edgegrid.EnvVarEdgercPath), homeDir)
-	apiClientOpts.ConfigSection = getEnv(string(edgegrid.EnvVarEdgercSection), "default")
-
-	/*
-		Sets default values for app and global flags
-	*/
-	appName := "akamai-overview"
-
-	app := cli.NewApp()
-	app.Name = appName
-	app.HelpName = appName
-	app.Usage = "A CLI to interact with Akamai account information"
-	app.Version = appVer
-	app.Copyright = ""
-	app.Authors = []cli.Author{
-		{
-			Name: "Petr Artamonov",
-		},
-		{
-			Name: "Rafal Pieniazek",
-		},
-	}
-
-	app.Flags = []cli.Flag{
-		cli.StringFlag{
-			Name:        "section, s",
-			Value:       "default",
-			Usage:       "`NAME` of section to use from credentials file",
-			Destination: &apiClientOpts.ConfigSection,
-			EnvVar:      string(edgegrid.EnvVarEdgercSection),
-		},
-		cli.StringFlag{
-			Name:        "config, c",
-			Value:       homeDir,
-			Usage:       "Location of the credentials `FILE`",
-			Destination: &apiClientOpts.ConfigPath,
-			EnvVar:      string(edgegrid.EnvVarEdgercPath),
-		},
-	}
-
+	app := common.CreateNewApp(appName, "A CLI to interact with Akamai account information", appVer)
+	app.Flags = common.CreateFlags()
 	app.Before = func(c *cli.Context) error {
+
+		apiClientOpts := &edgegrid.ClientOptions{}
+		apiClientOpts.ConfigPath = c.GlobalString("config")
+		apiClientOpts.ConfigSection = c.GlobalString("section")
+		apiClientOpts.DebugLevel = c.GlobalString("debug")
 
 		// create new Akamai API client
 		apiClient = edgegrid.NewClient(nil, apiClientOpts)
-
-		// if err != nil {
-		// 	return cli.NewExitError(errorProfile, 1)
-		// }
 
 		return nil
 	}
@@ -194,17 +142,4 @@ func main() {
 		log.Fatal(err)
 	}
 
-}
-
-func verifyArgumentByName(c *cli.Context, argName string) {
-	if c.String(argName) == "" {
-		log.Fatal(fmt.Sprintf("Please provide required argument(s)! [ %s ]", argName))
-	}
-}
-
-func getEnv(key, fallback string) string {
-	if value, ok := os.LookupEnv(key); ok {
-		return value
-	}
-	return fallback
 }

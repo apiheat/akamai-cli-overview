@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 
+	common "github.com/apiheat/akamai-cli-common"
 	"github.com/urfave/cli"
 )
 
@@ -20,7 +21,7 @@ func listContracts(c *cli.Context) error {
 		fmt.Println(err)
 	}
 
-	OutputJSON(contracts)
+	common.OutputJSON(contracts)
 
 	return nil
 }
@@ -39,7 +40,7 @@ func listGroups(c *cli.Context) error {
 		fmt.Println(err)
 	}
 
-	OutputJSON(groups)
+	common.OutputJSON(groups)
 
 	return nil
 }
@@ -52,14 +53,14 @@ func cmdListProducts(c *cli.Context) error {
 }
 
 func listProducts(c *cli.Context) error {
-	verifyArgumentByName(c, "contractID")
+	common.VerifyArgumentByName(c, "contractID")
 
 	products, _, err := apiClient.PropertyAPI.ListPropertyAPIProducts(contractID)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	OutputJSON(products)
+	common.OutputJSON(products)
 
 	return nil
 }
@@ -72,15 +73,15 @@ func cmdListCPcodes(c *cli.Context) error {
 }
 
 func listCPcodes(c *cli.Context) error {
-	verifyArgumentByName(c, "contractID")
-	verifyArgumentByName(c, "groupID")
+	common.VerifyArgumentByName(c, "contractID")
+	common.VerifyArgumentByName(c, "groupID")
 
 	cpcodes, _, err := apiClient.PropertyAPI.ListPropertyAPICPCodes(contractID, groupID)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	OutputJSON(cpcodes)
+	common.OutputJSON(cpcodes)
 
 	return nil
 }
@@ -93,15 +94,15 @@ func cmdListEdgeHostNames(c *cli.Context) error {
 }
 
 func listEdgeHostNames(c *cli.Context) error {
-	verifyArgumentByName(c, "contractID")
-	verifyArgumentByName(c, "groupID")
+	common.VerifyArgumentByName(c, "contractID")
+	common.VerifyArgumentByName(c, "groupID")
 
 	edgeHosts, _, err := apiClient.PropertyAPI.ListPropertyAPICPEdgehosts(contractID, groupID)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	OutputJSON(edgeHosts)
+	common.OutputJSON(edgeHosts)
 
 	return nil
 }
@@ -114,15 +115,15 @@ func cmdListProperties(c *cli.Context) error {
 }
 
 func listProperties(c *cli.Context) error {
-	verifyArgumentByName(c, "contractID")
-	verifyArgumentByName(c, "groupID")
+	common.VerifyArgumentByName(c, "contractID")
+	common.VerifyArgumentByName(c, "groupID")
 
 	allProperties, _, err := apiClient.PropertyAPI.ListPropertyAPIProperties(contractID, groupID)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	OutputJSON(allProperties)
+	common.OutputJSON(allProperties)
 
 	return nil
 }
@@ -146,7 +147,7 @@ func listRules(c *cli.Context) error {
 		return err
 	}
 
-	OutputJSON(k.RuleFormats.Items)
+	common.OutputJSON(k.RuleFormats.Items)
 
 	return nil
 }
@@ -166,7 +167,7 @@ func listOverrides(c *cli.Context) error {
 		return err
 	}
 
-	OutputJSON(k)
+	common.OutputJSON(k)
 
 	return nil
 }
@@ -186,7 +187,7 @@ func listBehaviors(c *cli.Context) error {
 		return err
 	}
 
-	OutputJSON(k)
+	common.OutputJSON(k)
 
 	return nil
 }
