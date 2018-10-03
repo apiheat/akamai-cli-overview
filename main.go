@@ -1,7 +1,7 @@
 package main
 
 import (
-	"log"
+	"fmt"
 	"os"
 	"sort"
 
@@ -28,8 +28,14 @@ func main() {
 		apiClientOpts.ConfigSection = c.GlobalString("section")
 		apiClientOpts.DebugLevel = c.GlobalString("debug")
 
-		// create new Akamai API client
-		apiClient = edgegrid.NewClient(nil, apiClientOpts)
+		// NewClient: Creates new client and returns errNewExitError
+		// 			  if we failed to init
+		var errNewClient error
+		apiClient, errNewClient = edgegrid.NewClient(nil, apiClientOpts)
+
+		if errNewClient != nil {
+			cli.NewExitError(errNewClient, 1)
+		}
 
 		return nil
 	}
@@ -139,7 +145,7 @@ func main() {
 
 	err := app.Run(os.Args)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
 }
