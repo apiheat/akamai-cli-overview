@@ -5,9 +5,9 @@
   "commands": [
     {
       "name": "overview",
-      "version": "0.0.5",
+      "version": "3.0.0",
       "description": "Properties Overview Commands",
-      "bin": "https://github.com/partamonov/akamai-cli-overview/releases/download/v{{.Version}}/akamai-{{.Name}}_{{.OS}}_{{.Arch}}{{.BinSuffix}}"
+      "bin": "https://github.com/apiheat/akamai-cli-overview/releases/download/v{{.Version}}/akamai-cli-{{.Name}}_{{.OS}}_{{.Arch}}{{.BinSuffix}}"
     }
   ]
 }
