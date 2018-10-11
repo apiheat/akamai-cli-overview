@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 
+	"github.com/apiheat/go-edgegrid"
+
 	common "github.com/apiheat/akamai-cli-common"
 	"github.com/urfave/cli"
 )
@@ -111,6 +113,10 @@ func listEdgeHostNames(c *cli.Context) error {
 	ListProperties
 */
 func cmdListProperties(c *cli.Context) error {
+	if c.Bool("all") {
+		return listAllProperties(c)
+	}
+
 	return listProperties(c)
 }
 
@@ -121,6 +127,34 @@ func listProperties(c *cli.Context) error {
 	allProperties, _, err := apiClient.Property.ListPropertyProperties(contractID, groupID)
 	if err != nil {
 		fmt.Println(err)
+	}
+
+	common.OutputJSON(allProperties)
+
+	return nil
+}
+
+func listAllProperties(c *cli.Context) error {
+	groups, _, err := apiClient.Property.ListPropertyGroups()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	var allProperties edgegrid.PropertyProps
+
+	for _, group := range groups.Groups.Items {
+		if group.ContractIds != nil {
+			properties, _, err := apiClient.Property.ListPropertyProperties(group.ContractIds[0], group.GroupID)
+			if err != nil {
+				fmt.Println(err)
+			}
+
+			if len(properties.Properties.Items) > 0 {
+				for _, item := range properties.Properties.Items {
+					allProperties.Properties.Items = append(allProperties.Properties.Items, item)
+				}
+			}
+		}
 	}
 
 	common.OutputJSON(allProperties)
