@@ -22,20 +22,19 @@ func main() {
 	app := common.CreateNewApp(appName, "A CLI to interact with Akamai account information", appVer)
 	app.Flags = common.CreateFlags()
 	app.Before = func(c *cli.Context) error {
+		var err error
 
 		apiClientOpts := &edgegrid.ClientOptions{}
 		apiClientOpts.ConfigPath = c.GlobalString("config")
 		apiClientOpts.ConfigSection = c.GlobalString("section")
 		apiClientOpts.DebugLevel = c.GlobalString("debug")
+		apiClientOpts.AccountSwitchKey = c.GlobalString("ask")
 
-		// NewClient: Creates new client and returns errNewExitError
-		// 			  if we failed to init
-		var errNewClient error
-		apiClient, errNewClient = edgegrid.NewClient(nil, apiClientOpts)
+		apiClient, err = edgegrid.NewClient(nil, apiClientOpts)
 
-		if errNewClient != nil {
-			    fmt.Println(errNewClient)
-			    os.Exit(1)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
 		}
 
 		return nil
